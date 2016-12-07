@@ -80,7 +80,7 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        // checkCollisions();
+        checkCollisions();
     }
 
     /* This is called by the update function and loops through all of the
@@ -94,8 +94,28 @@ var Engine = (function(global) {
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
-        player.update();
+        player.update(dt);
     }
+
+
+    /* This function checks for collisions between player and an enemy and
+     * resets the game if collision has occured. If the player has reached
+     * the water, then a 'success' message is displayed and game is reset.
+     */
+
+    function checkCollisions() {
+        allEnemies.forEach(function(enemy) {
+            if (player.y === enemy.y && player.x > (enemy.x - 80) && player.x < (enemy.x + 90)) {
+                reset();
+            };
+        });
+
+        if (player.y === water) {
+            window.alert('Success!');
+            reset();
+        };
+    }
+
 
     /* This function initially draws the "game level", it will then call
      * the renderEntities function. Remember, this function is called every
@@ -159,7 +179,8 @@ var Engine = (function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        // noop
+        player.x = playerInitX;
+        player.y = playerInitY;
     }
 
     /* Go ahead and load all of the images we know we're going to need to

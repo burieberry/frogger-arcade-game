@@ -1,81 +1,71 @@
-// Enemies our player must avoid
-var Enemy = function(x, y, z) {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
+'use strict';
 
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
-
-    this.sprite = 'images/enemy-bug.png';
+// Game character
+var Character = function(x, y, z, sprite) {
+    'use strict';
     this.x = x;
     this.y = y;
     this.speed = z;
-
-    this.width = 505;
-    this.height = 606;
+    this.sprite = sprite;
 };
-
-
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
-Enemy.prototype.update = function(dt) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
-    if (this.x < this.width) {
+Character.prototype.update = function(dt) {
+    'use strict';
+    // Update the Character's position, required method for game
+    // Parameter: dt, a time delta between ticks
+    if (this.x < canvasWidth) {
         this.x += this.speed * dt;
-        allEnemies.forEach(function(enemy) {
-            if (player.y === enemy.y && player.x > (enemy.x - 80) && player.x < (enemy.x + 90)) {
-                player.x = playerInitX;
-                player.y = playerInitY;
-
-            };
-        });
     } else {
         this.x = -distX;
     };
 };
-
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function() {
+Character.prototype.render = function() {
+    'use strict';
+    // Draw the Character on the screen
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
 
-// Player
-var Player = function(x, y) {
-    this.sprite = 'images/char-horn-girl.png'; // load player image
-    this.x = x;
-    this.y = y;
-};
+// Enemy is a subclass of Character
+// Enemies our player must avoid
 
-Player.prototype.update = function() {
-    if (player.y === water) {
-        window.alert('Success!');
-        player.x = playerInitX;
-        player.y = playerInitY;
-    };
-};
+var Enemy = function(x, y, z) {
+    'use strict';
+    Character.call(this, x, y, z);
 
-Player.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    // The image/sprite for our enemies, this uses
+    // a helper we've provided to easily load images
+    this.sprite = 'images/enemy-bug.png';
 };
+Enemy.prototype = Object.create(Character.prototype);
+Enemy.prototype.constructor = Enemy;
+
+
+
+// Player is a subclass of Character
+// handleInput() method is specific to this subclass
+
+// Player:
+var Player = function(x, y, z) {
+    'use strict';
+    Character.call(this, x, y, z);
+    this.sprite = 'images/char-horn-girl.png';
+};
+Player.prototype = Object.create(Character.prototype);
+Player.prototype.constructor = Player;
 
 Player.prototype.handleInput = function(key) {
-    if (key === 'left' && player.x > 0) {
-        player.x -= distX;
+    'use strict';
+    if (key === 'left' && this.x > 0) {
+        this.x -= distX;
     } else {
-        if (key === 'right' && player.x < distLastX) {
-            player.x += distX;
+        if (key === 'right' && this.x < distLastX) {
+            this.x += distX;
         } else {
-            if (key === 'up' && player.y > 0) {
-                player.y -= distY;
+            if (key === 'up' && this.y > 0) {
+                this.y -= distY;
             } else {
-                if (key === 'down' && player.y < grassL2) {
-                    player.y += distX;
+                if (key === 'down' && this.y < grassL2) {
+                    this.y += distX;
                 };
             };
         };
@@ -83,23 +73,23 @@ Player.prototype.handleInput = function(key) {
 };
 
 
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
+// Constants:
+var canvasWidth = 505,  // game board width
+    canvasHeight = 606; // game board height
+var distX = 101,        // column width
+    distLastX = 404;    // x-coordinate of Player on the last column
+var distY = 80;         // row height
+var water = -20;    // y-coordinate on the water row
 
+var stoneL1 = 60,   // y-coordinate of Character on first pavement row from the top
+    stoneL2 = 140,  // y-coordinate on second pavement row from the top
+    stoneL3 = 220,  // y-coordinate on third and last pavement row
+    grassL1 = 300,  // y-coordinate of Player on first grass row from the top
+    grassL2 = 380;  // y-coordinate on second and last grass row
+
+// Instantiating objects
+// All enemy objects are in an array called allEnemies:
 var allEnemies = ['enemy1', 'enemy2', 'enemy3', 'enemy4', 'enemy5', 'enemy6'];
-
-var distX = 101,
-    distLastX = 404;
-var distY = 80;
-var water = -20;
-
-var stoneL1 = 60,
-    stoneL2 = 140,
-    stoneL3 = 220,
-    grassL1 = 300,
-    grassL2 = 380;
-
 
 var enemy1 = new Enemy(0, stoneL1, 100);
 allEnemies[0] = enemy1;
@@ -119,9 +109,10 @@ allEnemies[4] = enemy5;
 var enemy6 = new Enemy(-303, stoneL3, 250);
 allEnemies[5] = enemy6;
 
+// The player object is in a variable called player:
 var playerInitX = 2 * distX;
 var playerInitY = grassL2;
-var player = new Player(playerInitX, playerInitY);
+var player = new Player(playerInitX, playerInitY, 0);
 
 
 // This listens for key presses and sends the keys to your
